@@ -22,16 +22,16 @@
     "all_frames": true
   }],
   "icons": {
-    "16": "icons/icon.svg",
-    "48": "icons/icon.svg",
-    "128": "icons/icon.svg"
+    "16": "icons/pa_capture.svg",
+    "48": "icons/pa_capture.svg",
+    "128": "icons/pa_capture.svg"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/icon.svg",
-      "48": "icons/icon.svg",
-      "128": "icons/icon.svg"
+      "16": "icons/pa_capture.svg",
+      "48": "icons/pa_capture.svg",
+      "128": "icons/pa_capture.svg"
     }
   },
   "browser_specific_settings": {
