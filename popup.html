@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PA Capture</title>
+  <style>
+    body { width: 220px; padding: 12px; font-family: sans-serif; font-size: 13px; margin: 0; }
+    #status { margin-bottom: 10px; color: #0078d4; font-weight: 600; min-height: 18px; }
+    label { display: block; margin-bottom: 4px; }
+    input[type=range] { width: 100%; }
+    #dwell-value { font-size: 11px; color: #555; }
+    button { width: 100%; margin-top: 8px; padding: 6px; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; }
+    #btn-start { background: #0078d4; color: #fff; border-color: #0078d4; }
+    #btn-start:disabled { background: #ccc; border-color: #ccc; cursor: default; }
+    #btn-cancel { background: #fff; color: #c00; border-color: #c00; display: none; }
+  </style>
+</head>
+<body>
+  <div id="status">Idle</div>
+
+  <label>
+    Dwell time: <span id="dwell-value">1200 ms</span>
+    <input type="range" id="dwell" min="400" max="4000" step="100" value="1200" title="Minimum 1200 ms is applied per tile for stable captures">
+  </label>
+
+  <label style="margin-top: 8px;">
+    <input type="checkbox" id="auto-zoom" checked />
+    Auto-set effective zoom to 100% before capture
+  </label>
+
+  <button id="btn-start">Start Capture</button>
+  <button id="btn-cancel">Cancel</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>

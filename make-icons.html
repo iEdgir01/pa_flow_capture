@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+function makeIcon(size) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0078d4';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${Math.floor(size * 0.5)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('P', size / 2, size / 2);
+  c.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `icon${size}.png`;
+    a.click();
+  });
+}
+[16, 48, 128].forEach(s => {
+  const btn = document.createElement('button');
+  btn.textContent = `Download icon${s}.png`;
+  btn.onclick = () => makeIcon(s);
+  document.body.appendChild(btn);
+  document.body.appendChild(document.createElement('br'));
+});
+</script>
+</body>
+</html>
