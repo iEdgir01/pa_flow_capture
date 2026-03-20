@@ -550,7 +550,7 @@ function ensurePrecisionCursor() {
   const arm = 11;
   const gap = 3.5;
 
-  precisionCursorEl.innerHTML = `
+  const cursorSvgMarkup = `
 <svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">
   <defs>
     <filter id="__pa-cursor-drop" x="-40%" y="-40%" width="180%" height="180%">
@@ -586,6 +586,30 @@ function ensurePrecisionCursor() {
   <circle cx="${cx}" cy="${cy}" r="1.5" fill="#0a0a0a" opacity="0.85"/>
   <circle cx="${cx}" cy="${cy}" r="0.7" fill="#ffffff"/>
 </svg>`;
+  try {
+    const parsed = new DOMParser().parseFromString(cursorSvgMarkup, 'image/svg+xml');
+    const svgEl = parsed.documentElement;
+    if (svgEl && svgEl.nodeName.toLowerCase() === 'svg') {
+      precisionCursorEl.appendChild(document.importNode(svgEl, true));
+    } else {
+      throw new Error('cursor svg parse failed');
+    }
+  } catch (e) {
+    // Fallback simple crosshair if SVG parse is blocked.
+    const fallback = document.createElement('div');
+    Object.assign(fallback.style, {
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      width: '18px',
+      height: '18px',
+      border: '2px solid #fff',
+      borderRadius: '50%',
+      transform: 'translate(-50%, -50%)',
+      boxShadow: '0 0 0 2px rgba(0,0,0,0.75)'
+    });
+    precisionCursorEl.appendChild(fallback);
+  }
 
   document.body.appendChild(precisionCursorEl);
 }
