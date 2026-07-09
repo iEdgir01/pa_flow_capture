@@ -1,2 +1,6 @@
 published-versions/
 versions/
+
+# Claude Code
+.claude/settings.local.json
+.superpowers/
