@@ -13,6 +13,6 @@
       (`1c7c1d2`, `62f2bed`, `49e4046`)
 
 ## Phase 2 — Next milestone
-- [ ] pending — no scope defined yet; next session should get task from user
-      (bug fix against a real PA flow, new capture feature, or next release
-      packaging).
+- [ ] pending — no scope is defined yet. In the next session, get the task
+      from the user: a bug fix against a real PA flow, a new capture
+      feature, or the next release packaging.

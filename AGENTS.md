@@ -4,76 +4,51 @@ Guidance for AI coding agents working in this repository.
 
 ## Project overview
 
-Firefox MV3 extension (`manifest.json` v1.0.1) that captures a Power Automate /
-Power Apps maker-portal flow designer canvas — which can be far larger than one
-screen — as a single stitched PNG. User Ctrl+clicks two anchor points on the
-canvas to define capture bounds, the extension scrolls the canvas tile-by-tile
-(`content.js`), captures each tile via `tabs.captureVisibleTab` and stitches
-them on an `OffscreenCanvas` with horizontal seam-matching to hide column
-joins (`background.js`).
+This project is a Firefox MV3 extension (`manifest.json` v1.0.1).
+The extension captures a Power Automate / Power Apps maker-portal flow designer canvas as a single stitched PNG.
+The canvas can be far larger than one screen.
 
-Host permissions are scoped only to `make.powerautomate.com` and
-`make.powerapps.com`. No build step; loaded as a temporary add-on for dev, or
-packaged with `web-ext build` for release.
+User flow:
+
+1. User Ctrl+clicks two anchor points on the canvas. This defines the capture bounds.
+2. The extension scrolls the canvas tile-by-tile (`content.js`).
+3. The extension captures each tile with `tabs.captureVisibleTab`.
+4. The extension stitches the tiles on an `OffscreenCanvas`.
+5. The extension applies horizontal seam-matching to hide column joins (`background.js`).
+
+Host permissions apply only to `make.powerautomate.com` and `make.powerapps.com`.
+The extension has no build step.
+For development, load it as a temporary add-on.
+For release, package it with `web-ext build`.
 
 ## Current status
 
-- Latest packaged release: `published-versions/pa_flow_capture_V1.0.1.zip`
-  (Mar 20), matching `manifest.json` version `1.0.1`.
-- Repo history (7 commits) shows an initial feature commit followed
-  entirely by hardening/fix commits: AMO data-collection consent schema,
-  removing unsafe `innerHTML` in the precision cursor overlay, icon cleanup.
-  No new capture features have landed since v1.0.1 — the project is in a
-  stabilization/maintenance phase, not active feature development.
-- Working tree is clean except `ai-context/` (untracked — this session's
-  scaffolding work).
-- Numerous debug/diagnostic constants exist in both `content.js` and
-  `background.js` (see Gotchas in `ai-context/technical.md`) — all currently
-  `false`/off for normal use.
+- Latest packaged release: `published-versions/pa_flow_capture_V1.0.1.zip` (Mar 20). Matches `manifest.json` version `1.0.1`.
+- Repo history: 7 commits. First commit adds the feature. Later commits are hardening or fix commits (AMO data-collection consent schema, removal of unsafe `innerHTML` in precision cursor overlay, icon cleanup).
+- No new capture features have landed since v1.0.1. The project is in stabilization and maintenance.
+- Working tree is clean except for `ai-context/` (untracked — this session's scaffolding).
+- Both `content.js` and `background.js` contain many debug constants (see Gotchas in `ai-context/technical.md`). All are currently `false` or off for normal use.
 
 ## Key decisions
 
-- **Frame-claim race for iframe ownership**: PA embeds the flow designer in a
-  same- or cross-origin iframe. Because `content_scripts.all_frames: true`
-  injects into every frame, `background.js` runs a short-timeout "claim" race
-  (`captureClaims` map, 150ms timer) so exactly one frame — scored by
-  detected canvas size — becomes the capture owner. Popup and later messages
-  route to that owner frame only (`captureOwnerByTab`). This avoids duplicate
-  overlays and wrong-frame state.
-- **Crop math done in background, not content script**: Firefox content
-  scripts had issues with canvas/`toDataURL` on captured tab screenshots, so
-  cropping/stitching happens in `background.js` off `OffscreenCanvas`
-  (module-type background script, MV3).
-- **Seam matching over fixed overlap**: tiles are captured with ~10% overlap
-  (`stepX`/`stepY` = 90% of viewport) and a grayscale SAD (sum of absolute
-  differences) search picks the best horizontal shift + seam cut column per
-  tile join, rather than trusting a fixed overlap width — PA's own
-  virtualization/rendering can shift content slightly between scrolls.
-- **Precision cursor and Ctrl+click anchors**: plain click was too easy to
-  trigger accidentally while scrolling the canvas, so anchor placement
-  requires Ctrl+click; a custom SVG crosshair cursor replaces the OS cursor
-  during placement mode for exact pixel targeting.
-- **No data collection**: `browser_specific_settings.gecko.data_collection_permissions`
-  is explicitly `{ required: ["none"], optional: [] }` — required for AMO
-  submission (see fix commit `1359bac`).
+- **Frame-claim race for iframe ownership:** PA embeds the flow designer in an iframe. `content_scripts.all_frames: true` injects into every frame. `background.js` runs a short-timeout claim race (`captureClaims` map, 150ms). The race scores each frame by detected canvas size. Exactly one frame becomes the capture owner. Later messages route only to that owner (`captureOwnerByTab`).
+- **Crop math in background, not content script:** Firefox content scripts had issues with canvas and `toDataURL` on tab screenshots. Cropping and stitching happen in `background.js` with `OffscreenCanvas` (MV3 module background).
+- **Seam matching over fixed overlap:** Tiles use about 10% overlap (`stepX`/`stepY` = 90% of viewport). A grayscale SAD search picks the best horizontal shift and seam cut column. This does not rely on a fixed overlap width.
+- **Precision cursor and Ctrl+click anchors:** Plain click was too easy to trigger by accident. Anchor placement requires Ctrl+click. A custom SVG crosshair replaces the OS cursor during placement.
+- **No data collection:** `browser_specific_settings.gecko.data_collection_permissions` is `{ required: ["none"], optional: [] }`. AMO submission requires this (see commit `1359bac`).
 
 ## To-do
 
-- [x] Governance scaffold created; AGENTS.md and ai-context/ populated with
-      real content from repo survey — verified by reading README, manifest,
-      content.js, background.js, popup.js, git log, and published-versions/.
-- [ ] pending — confirm whether `ai-context/` should be added to `.gitignore`
-      (repo has no existing agent-context convention; currently untracked).
-- [ ] pending — no active feature work identified; next session should ask
-      the user what's next (bug report, new PA UI compat, or new release).
+- [x] Governance scaffold created. AGENTS.md and ai-context/ hold real content from a repo survey.
+- [ ] pending — confirm whether `ai-context/` should be added to `.gitignore` (currently untracked; no existing agent-context convention).
+- [ ] pending — no active feature work identified. Ask the user for the next task in the next session.
 
 ## File map (ai-context/)
 
-- `technical.md` — stack (vanilla JS, no build), MV3 architecture, message
-  types, debug flags, run/package commands.
-- `resume.md` — cold-start summary for a new agent session.
-- `todo.md` — active task list.
-- `build-plan.md` — phase history / milestones.
+- `technical.md` — stack (vanilla JS, no build), MV3 architecture, message types, debug flags, run and package commands
+- `resume.md` — cold-start summary
+- `todo.md` — active task list
+- `build-plan.md` — phase history and milestones
 
 ## Rules for all agents working on this project
 
