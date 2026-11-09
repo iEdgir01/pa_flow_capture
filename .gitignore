@@ -14,3 +14,5 @@ CLAUDE.md
 .env
 .env.*
 __pycache__/
+
+graphify-out/
